@@ -55,7 +55,15 @@ class Agency(object):
                 return editor
 
     def remove_editor(self, editor):
+        for edit in self.editors:
+            for paper in editor.newspapers:
+                if paper in edit.newspapers:
+                    edit.issues.extend(editor.issues)
+                    for issue in edit.issues:
+                        issue.editor = edit
+                        issue.editor_id = edit.editor_id
         self.editors.remove(editor)
+
 
     def editor_issues(self, editor):
         return editor.issues
@@ -75,6 +83,8 @@ class Agency(object):
                 return sub
 
     def remove_subscriber(self, subscriber):
+        for p in subscriber.subscribes:
+            p.subscribers.remove(subscriber)
         self.subscribers.remove(subscriber)
 
 

@@ -2,9 +2,10 @@ from .newspaper import Newspaper
 
 
 class Subscriber(object):
-    def __init__(self, subscriber_id, name):
+    def __init__(self, subscriber_id, name, address):
         self.subscriber_id = subscriber_id
         self.name = name
+        self.address = address
         self.subscribes = []
         self.issues = []
         self.subs_num = len(self.subscribes)

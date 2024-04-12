@@ -12,6 +12,7 @@ editor_ns = Namespace('editor', description='Editor related operations')
 editor_model = editor_ns.model('Editor', {
     'editor_id': fields.Integer,
     'name': fields.String,
+    'address': fields.String
 })
 
 
@@ -23,7 +24,8 @@ class EditorAPI(Resource):
     def post(self):
         editor_id = int(str(time.time())[7:10])
         new_editor = Editor(editor_id=editor_id,
-                            name=editor_ns.payload['name'])
+                            name=editor_ns.payload['name'],
+                            address=editor_ns.payload['pages'])
         Agency.get_instance().add_editor(new_editor)
         return new_editor
 
@@ -64,6 +66,7 @@ class EditorID(Resource):
 editor_issues_model = editor_ns.model('EditorIssues', {
     'issue_id': fields.Integer,
     'name': fields.String,
+    'address': fields.String,
     'releasedate': fields.String(required=False),
     'released': fields.Boolean,
 })

@@ -93,11 +93,13 @@ class NewspaperID(Resource):
 
 issue_model = newspaper_ns.model('Issue', {
     'name': fields.String,
+    'pages': fields.Integer
 })
 
 issue_get_model = newspaper_ns.model('IssueGet', {
     'issue_id': fields.Integer,
     'name': fields.String,
+    'pages': fields.Integer,
     'releasedate': fields.String(required=False),
     'released': fields.Boolean,
     'editor_id': fields.Integer
@@ -111,12 +113,14 @@ class IssueAPI(Resource):
     @newspaper_ns.marshal_with(issue_model, envelope='newspaper')
     def post(self, paper_id):
         issue_id = int(str(time.time())[5:10])
-        new_issue = Issue(issue_id=issue_id,
-                          name=newspaper_ns.payload['name'],
-                          released=False)
         targeted_paper = Agency.get_instance().get_newspaper(paper_id)
         if not targeted_paper:
-            return 'The following paper was NOT found'
+            return jsonify('The following paper was NOT found')
+        new_issue = Issue(issue_id=issue_id,
+                          name=newspaper_ns.payload['name'],
+                          pages=newspaper_ns.payload['pages'],
+                          newspaper=targeted_paper,
+                          released=False)
         targeted_paper.add_issue(new_issue)
         return new_issue
 
@@ -125,7 +129,7 @@ class IssueAPI(Resource):
     def get(self, paper_id):
         targeted_paper = Agency.get_instance().get_newspaper(paper_id)
         if not targeted_paper:
-            return 'The following paper was NOT found'
+            return jsonify('The following paper was NOT found')
         return targeted_paper.all_issues()
 
 
@@ -137,7 +141,7 @@ class IssueID(Resource):
         targeted_newspaper = Agency.get_instance().get_newspaper(paper_id)
         targeted_issue = targeted_newspaper.get_issue(issue_id)
         if not targeted_issue:
-            return 'The following issue was NOT found'
+            return jsonify('The following issue was NOT found')
         return targeted_issue
 
 
@@ -148,10 +152,10 @@ class IssueRelease(Resource):
     def post(self, paper_id, issue_id):
         targeted_newspaper = Agency.get_instance().get_newspaper(paper_id)
         if not targeted_newspaper:
-            return 'The following newspaper was NOT found'
+            return jsonify('The following newspaper was NOT found')
         targeted_issue = targeted_newspaper.get_issue(issue_id)
         if not targeted_issue:
-            return 'The following issue was NOT found'
+            return jsonify('The following issue was NOT found')
         targeted_issue.releasedate = datetime.date.today()
         targeted_newspaper.release_issue(issue_id)
         return targeted_issue
@@ -171,13 +175,13 @@ class IssueEditor(Resource):
         editor_id = newspaper_ns.payload['editor_id']
         targeted_newspaper = Agency.get_instance().get_newspaper(paper_id)
         if not targeted_newspaper:
-            return 'The following newspaper was NOT found'
+            return jsonify('The following newspaper was NOT found')
         targeted_issue = targeted_newspaper.get_issue(issue_id)
         if not targeted_issue:
-            return 'The following issue was NOT found'
+            return jsonify('The following issue was NOT found')
         targeted_editor = Agency.get_instance().get_editor(editor_id)
         if not targeted_editor:
-            return f'Editor with ID {editor_id} was NOT found'
+            return jsonify(f'Editor with ID {editor_id} was NOT found')
         targeted_issue.set_editor(targeted_editor)
         return f'Editor {targeted_editor} set for the issue {targeted_issue}'
 
@@ -187,23 +191,23 @@ class IssueDeliver(Resource):
     def post(self, paper_id, issue_id):
         targeted_newspaper = Agency.get_instance().get_newspaper(paper_id)
         if not targeted_newspaper:
-            return 'The following newspaper was NOT found'
+            return jsonify('The following newspaper was NOT found')
         targeted_issue = targeted_newspaper.get_issue(issue_id)
         if not targeted_issue:
-            return 'The following issue was NOT found'
+            return jsonify('The following issue was NOT found')
         if targeted_issue.released:
             for sub in Agency.get_instance().all_subscribers():
                 if targeted_newspaper in sub.subscribes:
                     sub.issues.append(targeted_issue)
-                    return f'Issue {targeted_issue.issue_id} was delivered SUCCESSFULLY'
+                    return jsonify(f'Issue {targeted_issue.issue_id} was delivered SUCCESSFULLY')
         else:
-            return f'Issue with ID {targeted_issue.issue_id} was NOT released yet'
+            return jsonify(f'Issue with ID {targeted_issue.issue_id} was NOT released yet')
 
 
 newspaper_statistics_model = newspaper_ns.model('NewspaperStats', {
     'paper_id': fields.Integer,
-    'name':fields.String,
-    'number_of_subscribers':fields.Integer,
+    'name': fields.String,
+    'number_of_subscribers': fields.Integer,
     'monthly_revenue': fields.Integer,
     'annual_revenue': fields.Integer
 })
@@ -215,7 +219,7 @@ class NewspaperStats(Resource):
     def get(self, paper_id):
         targeted_paper = Agency.get_instance().get_newspaper(paper_id)
         if not targeted_paper:
-            return f'Newspaper with ID {paper_id} was NOT found'
+            return jsonify(f'Newspaper with ID {paper_id} was NOT found')
         targeted_paper.monthly()
         targeted_paper.annual()
         targeted_paper.num_subs()

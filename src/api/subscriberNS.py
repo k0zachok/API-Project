@@ -10,12 +10,14 @@ import time
 subscriber_ns = Namespace('subscriber', description='Subscriber related operations')
 
 subscriber_model = subscriber_ns.model('Subscriber', {
-    'name': fields.String
+    'name': fields.String,
+    'address': fields.String
 })
 
 subscriber_get_model = subscriber_ns.model('SubscriberGet', {
     'subscriber_id': fields.Integer,
-    'name': fields.String
+    'name': fields.String,
+    'address': fields.String
 })
 
 @subscriber_ns.route('/')
@@ -26,7 +28,8 @@ class SubscriberAPI(Resource):
     def post(self):
         subscriber_id = int(str(time.time())[6:10])
         new_subscriber = Subscriber(subscriber_id=subscriber_id,
-                                    name=subscriber_ns.payload['name'])
+                                    name=subscriber_ns.payload['name'],
+                                    address=subscriber_ns.payload['address'])
         Agency.get_instance().add_subscriber(new_subscriber)
         return new_subscriber
 
@@ -48,6 +51,7 @@ issues_model = subscriber_ns.model('Issues', {
 subscriber_info_model = subscriber_ns.model('SubInfoModel', {
     'subscriber_id': fields.Integer,
     'name': fields.String,
+    'address': fields.String,
     'subscribes': fields.List(fields.Nested(sub_newspaper_model), required=False),
     'issues': fields.List(fields.Nested(issues_model), required=False)
 })
