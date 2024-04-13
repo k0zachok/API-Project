@@ -2,6 +2,7 @@ from ..src.model.agency import Agency
 from ..src.model.newspaper import Newspaper
 from ..src.model.editor import Editor
 from ..src.model.subscriber import Subscriber
+from ..src.model.issue import Issue
 
 
 def create_newspapers(agency: Agency):
@@ -24,7 +25,23 @@ def create_subscriber(agency: Agency):
     sub3 = Subscriber(subscriber_id=915, name='Franklin', address='Cologne')
     agency.subscribers.extend([sub1, sub2, sub3])
 
+def create_issues(agency: Agency):
+    issue1 = Issue(issue_id=555, name='TestIssue', pages=20)
+    heute_paper = agency.get_newspaper(101)
+    heute_paper.add_issue(issue1)
+    issue2 = Issue(issue_id=987, name='NYTIssue', pages=15)
+    issue3 = Issue(issue_id=777, name='NYTimes2', pages=16)
+    NYTpaper = agency.get_newspaper(100)
+    NYTpaper.add_issue(issue2)
+    NYTpaper.add_issue(issue3)
+    issue4 = Issue(issue_id=111, name='WSJIssue', pages=11)
+    WSpaper = agency.get_newspaper(115)
+    WSpaper.add_issue(issue4)
+
+
+
 def populate(agency: Agency):
     create_newspapers(agency)
     create_editors(agency)
     create_subscriber(agency)
+    create_issues(agency)

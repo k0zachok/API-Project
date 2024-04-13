@@ -31,7 +31,7 @@ class Agency(object):
         for paper in self.newspapers:
             if paper.paper_id == paper_id:
                 return paper
-        return None
+        return 404
 
     def all_newspapers(self) -> List[Newspaper]:
         return self.newspapers
@@ -53,6 +53,7 @@ class Agency(object):
         for editor in self.editors:
             if editor.editor_id == editor_id:
                 return editor
+        return 404
 
     def remove_editor(self, editor):
         for edit in self.editors:
@@ -81,6 +82,7 @@ class Agency(object):
         for sub in self.subscribers:
             if sub.subscriber_id == subscriber_id:
                 return sub
+        return 404
 
     def remove_subscriber(self, subscriber):
         for p in subscriber.subscribes:

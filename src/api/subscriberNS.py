@@ -1,5 +1,5 @@
 from flask import jsonify
-from flask_restx import Namespace, reqparse, Resource, fields
+from flask_restx import Namespace, reqparse, Resource, fields, abort
 from ..model.issue import Issue
 from ..model.agency import Agency
 from ..model.newspaper import Newspaper
@@ -62,8 +62,8 @@ class SubscriberID(Resource):
     @subscriber_ns.marshal_with(subscriber_info_model, envelope='subscriber')
     def get(self, subscriber_id):
         targeted_subscriber = Agency.get_instance().get_subscriber(subscriber_id)
-        if not targeted_subscriber:
-            return 'The following subscriber was NOT found'
+        if targeted_subscriber == 404:
+            abort(404, f'Subscriber with ID {subscriber_id} was NOT found')
         return targeted_subscriber
 
     @subscriber_ns.doc(parser=subscriber_model, description="Update a subscriber's information")
@@ -71,8 +71,8 @@ class SubscriberID(Resource):
     @subscriber_ns.marshal_with(subscriber_model, envelope='subscriber')
     def post(self, subscriber_id):
         targeted_subscriber = Agency.get_instance().get_subscriber(subscriber_id)
-        if not targeted_subscriber:
-            return jsonify(f"Subscriber with ID {subscriber_id} was not found")
+        if targeted_subscriber == 404:
+            abort(404, f'Subscriber with ID {subscriber_id} was NOT found')
         targeted_subscriber.subscriber_id = subscriber_id
         targeted_subscriber.name = subscriber_ns.payload['name']
         return targeted_subscriber
@@ -80,10 +80,10 @@ class SubscriberID(Resource):
     @subscriber_ns.doc(description='Delete a subscriber')
     def delete(self, subscriber_id):
         targeted_subscriber = Agency.get_instance().get_subscriber(subscriber_id)
-        if not targeted_subscriber:
-            return f'Subscriber with ID {subscriber_id} was NOT found'
+        if targeted_subscriber == 404:
+            abort(404, f'Subscriber with ID {subscriber_id} was NOT found')
         Agency.get_instance().remove_subscriber(targeted_subscriber)
-        return f'Subscriber with ID {subscriber_id} was successfully removed'
+        return jsonify(f'Subscriber with ID {subscriber_id} was successfully removed')
 
 
 subscribe_model = subscriber_ns.model('SubscribeModel', {
@@ -97,10 +97,10 @@ class Subscribe(Resource):
     @subscriber_ns.marshal_with(subscribe_model, envelope='Subscribe')
     def post(self, subscriber_id):
         targeted_paper = Agency.get_instance().get_newspaper(subscriber_ns.payload['paper_id'])
-        if not targeted_paper:
-            return f'Newspaper with ID {subscriber_ns.payload["paper_id"]} was NOT found'
+        if targeted_paper == 404:
+            abort(404, f'Newspaper with ID {subscriber_ns.payload["paper_id"]} was NOT found')
         Agency.get_instance().get_subscriber(subscriber_id).subscribe(targeted_paper)
-        return f'Subscriber {subscriber_id} successfully subscribed on Newspaper {targeted_paper.paper_id}'
+        return targeted_paper
 
 subscriber_stats_model = subscriber_ns.model('SubStats', {
     'subscriber_id': fields.Integer,
@@ -117,8 +117,8 @@ class SubscriberStats(Resource):
     @subscriber_ns.marshal_with(subscriber_stats_model, envelope='substats')
     def get(self, subscriber_id):
         targeted_sub = Agency.get_instance().get_subscriber(subscriber_id)
-        if not targeted_sub:
-            return f'Subscriber with ID {subscriber_id} was NOT found'
+        if targeted_sub == 404:
+            abort(404, f'Subscriber with ID {subscriber_id} was NOT found')
         targeted_sub.monthly()
         targeted_sub.annual()
         targeted_sub.num_issues()
@@ -140,9 +140,9 @@ class MissingIssues(Resource):
     @subscriber_ns.marshal_with(missing_issues_model, envelope='missing issues')
     def get(self, subscriber_id):
         targeted_sub = Agency.get_instance().get_instance().get_subscriber(subscriber_id)
-        if not targeted_sub:
-            return f'Subscriber with ID {subscriber_id} was NOT found'
+        if targeted_sub == 404:
+            abort(404, f'Subscriber with ID {subscriber_id} was NOT found')
         targeted_sub.miss_issues()
         if len(targeted_sub.missing_issues) == 0:
-            return f'There are no missing issues for subscriber with ID {subscriber_id}'
+            abort(404, f'There is no missing issues for Subscriber {subscriber_id}')
         return targeted_sub

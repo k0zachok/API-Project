@@ -59,7 +59,8 @@ def test_remove_newspaper(agency):
 def test_add_editor(agency):
     before = len(agency.editors)
     new_editor = Editor(editor_id=1,
-                        name='Editor Name')
+                        name='Editor Name',
+                        address='Berlin')
     agency.add_editor(new_editor)
 
     assert before + 1 == len(agency.all_editors())
@@ -76,7 +77,8 @@ def test_all_editors(agency):
 def test_add_subscriber(agency):
     before = len(agency.editors)
     new_editor = Subscriber(subscriber_id=2,
-                        name='Jimmy')
+                        name='Jimmy',
+                        address='Rome')
     agency.add_subscriber(new_editor)
     assert len(agency.subscribers) == before + 1
 

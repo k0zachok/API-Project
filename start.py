@@ -4,8 +4,8 @@ if __name__ == '__main__':
     app = create_app()
     create_app().run(debug=False, port=7890)
 
-    #TODO: TODO in remove_editor implement transfering of issues to another editor (done, but have to check whole implementation(must change editor id and editor of the issue that has been transfered)),
-    #TODO: in subscriberNS
-    #TODO: change model of Editor(add displaying of newspapers)
-    #TODO: jsonify all of the returns
+    #TODO: Perfectly: remove_editor if there is no other editor - return an error
+    #TODO: Perfectly:   in subscriberNS
+    #TODO: Perfectly:   change model of Editor(add displaying of newspapers)
     #TODO: TESTS!!!
+    #TODO: In Agency Tests implement tests to check for the same id's

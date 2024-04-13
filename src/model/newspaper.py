@@ -18,6 +18,7 @@ class Newspaper(object):
 
     def add_issue(self, new_issue: Issue):
         self.issues.append(new_issue)
+        new_issue.newspaper = self
 
     def all_issues(self):
         return self.issues
@@ -26,7 +27,7 @@ class Newspaper(object):
         for issue in self.issues:
             if issue.issue_id == issue_id:
                 return issue
-        return None
+        return 404
 
     def release_issue(self, issue_id):
         for issue in self.issues:
@@ -37,7 +38,7 @@ class Newspaper(object):
         self.number_of_subscribers = len(self.subscribers)
 
     def monthly(self):
-        self.montly_revenue = ((30 // self.frequency) * self.price) * len(self.subscribers)
+        self.monthly_revenue = ((30 // self.frequency) * self.price) * len(self.subscribers)
 
     def annual(self):
-        self.annual_revenue = self.montly_revenue * 12
+        self.annual_revenue = self.monthly_revenue * 12

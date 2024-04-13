@@ -3,11 +3,11 @@ from .editor import Editor
 
 class Issue(object):
 
-    def __init__(self, issue_id, name, pages, newspaper, released: bool = False):
+    def __init__(self, issue_id, name, pages, released: bool = False):
         self.issue_id = issue_id
         self.name = name
         self.pages = pages
-        self.newspaper = newspaper
+        self.newspaper = None
         self.releasedate = None
         self.released: bool = released
 
