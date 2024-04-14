@@ -31,7 +31,11 @@ class EditorAPI(Resource):
         new_editor = Editor(editor_id=editor_id,
                             name=editor_ns.payload['name'],
                             address=editor_ns.payload['address'])
-        Agency.get_instance().add_editor(new_editor)
+        create = Agency.get_instance().add_editor(new_editor)
+        if create == 403:
+            abort(403, f'Editor with ID {editor_id} already exists')
+        else:
+            create
         return new_editor
 
     @editor_ns.marshal_list_with(editor_get_model, envelope='editors')
@@ -57,6 +61,7 @@ class EditorID(Resource):
             abort(404, f'Editor with ID {editor_id} was NOT found')
         targeted_editor.editor_id = editor_id
         targeted_editor.name = editor_ns.payload['name']
+        targeted_editor.address = editor_ns.payload['address']
         return targeted_editor
 
     @editor_ns.doc(description='Delete an editor')

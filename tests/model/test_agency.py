@@ -16,25 +16,24 @@ def test_add_newspaper(agency):
     assert len(agency.all_newspapers()) == before + 1
 
 
-# def test_add_newspaper_same_id_should_raise_error(agency):
-#     before = len(agency.newspapers)
-#     new_paper = Newspaper(paper_id=999,
-#                           name="Simpsons Comic",
-#                           frequency=7,
-#                           price=3.14)
-#
-#     # first adding of newspaper should be okay
-#     agency.add_newspaper(new_paper)
-#
-#     new_paper2 = Newspaper(paper_id=999,
-#                           name="Superman Comic",
-#                           frequency=7,
-#                           price=13.14)
-#
-#     with pytest.raises(ValueError, match='A newspaper with ID 999 already exists'):  # <-- this allows us to test for exceptions
-#         # this one should rais ean exception!
-#         agency.add_newspaper(new_paper2)
-#         assert ValueError
+def test_add_newspaper_same_id_should_raise_error(agency):
+    before = len(agency.newspapers)
+    new_paper = Newspaper(paper_id=726,
+                          name="Simpsons Comic",
+                          frequency=7,
+                          price=3.14)
+
+    # first adding of newspaper should be okay
+    agency.add_newspaper(new_paper)
+    assert len(agency.newspapers) == before + 1
+    new_paper2 = Newspaper(paper_id=726,
+                          name="Superman Comic",
+                          frequency=7,
+                          price=13.14)
+    check = agency.add_newspaper(new_paper2)
+    assert check == 403
+
+
 
 
 
@@ -65,6 +64,20 @@ def test_add_editor(agency):
 
     assert before + 1 == len(agency.all_editors())
 
+def test_add_editor_with_same_id(agency):
+    before = len(agency.editors)
+    new_editor1 = Editor(editor_id=5,
+                         name='Roger',
+                         address='Vienna')
+    agency.add_editor(new_editor1)
+    assert len(agency.editors) == before + 1
+
+    new_editor2 = Editor(editor_id=5,
+                         name='Frank',
+                         address='Miami')
+    check = agency.add_editor(new_editor2)
+    assert check == 403
+
 def test_remove_editor(agency):
     before = len(agency.editors)
     targeted_editor = agency.get_instance().get_editor(123)
@@ -74,23 +87,29 @@ def test_remove_editor(agency):
 
 def test_all_editors(agency):
     assert agency.editors == agency.all_editors()
+
 def test_add_subscriber(agency):
-    before = len(agency.editors)
-    new_editor = Subscriber(subscriber_id=2,
+    before = len(agency.subscribers)
+    new_subscriber = Subscriber(subscriber_id=2,
                         name='Jimmy',
                         address='Rome')
-    agency.add_subscriber(new_editor)
+    agency.add_subscriber(new_subscriber)
     assert len(agency.subscribers) == before + 1
 
-    # def test_add_subscriber_for_same_id(agency):
-    #     new_subscriber1 = Subscriber(subscriber_id=3,
-    #                             name='Jimmy')
-    #     agency.add_subscriber(new_subscriber1)
-    #
-    #     new_subscriber2 = Subscriber(subscriber_id=3,
-    #                             name='Ronald')
-    #
-    #     agency.add_subscriber(new_subscriber2)
+def test_add_subscriber_for_same_id(agency):
+    before = len(agency.subscribers)
+    new_subscriber1 = Subscriber(subscriber_id=3,
+                                name='Jimmy',
+                                 address='Krems')
+    agency.add_subscriber(new_subscriber1)
+    assert len(agency.subscribers) == before + 1
+
+    new_subscriber2 = Subscriber(subscriber_id=3,
+                                name='Ronald',
+                                 address='Vienna')
+    check = agency.add_subscriber(new_subscriber2)
+    assert check == 403
+
 
 def test_all_subscribers(agency):
     assert agency.subscribers == agency.all_subscribers()

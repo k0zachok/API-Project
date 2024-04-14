@@ -34,9 +34,14 @@ def create_issues(agency: Agency):
     NYTpaper = agency.get_newspaper(100)
     NYTpaper.add_issue(issue2)
     NYTpaper.add_issue(issue3)
+    targeted_editor = agency.get_editor(457)
+    issue2.set_editor(targeted_editor)
+    issue3.set_editor(targeted_editor)
     issue4 = Issue(issue_id=111, name='WSJIssue', pages=11)
     WSpaper = agency.get_newspaper(115)
     WSpaper.add_issue(issue4)
+
+
 
 
 

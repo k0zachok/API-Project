@@ -30,7 +30,10 @@ class SubscriberAPI(Resource):
         new_subscriber = Subscriber(subscriber_id=subscriber_id,
                                     name=subscriber_ns.payload['name'],
                                     address=subscriber_ns.payload['address'])
-        Agency.get_instance().add_subscriber(new_subscriber)
+        create = Agency.get_instance().add_subscriber(new_subscriber)
+        if create == 403:
+            abort(403, f'Subscriber with ID {subscriber.subscriber_id} already exists')
+        create
         return new_subscriber
 
     @subscriber_ns.doc(subscriber_get_model, description='List all subscribers')
@@ -75,6 +78,7 @@ class SubscriberID(Resource):
             abort(404, f'Subscriber with ID {subscriber_id} was NOT found')
         targeted_subscriber.subscriber_id = subscriber_id
         targeted_subscriber.name = subscriber_ns.payload['name']
+        targeted_subscriber.address = subscriber_ns.payload['address']
         return targeted_subscriber
 
     @subscriber_ns.doc(description='Delete a subscriber')

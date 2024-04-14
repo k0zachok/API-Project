@@ -1,5 +1,5 @@
 from typing import List, Union, Optional
-
+from flask_restx import abort
 from .newspaper import Newspaper
 from .editor import Editor
 from .subscriber import Subscriber
@@ -24,7 +24,7 @@ class Agency(object):
     def add_newspaper(self, new_paper: Newspaper):
         for paper in self.newspapers:
             if paper.paper_id == new_paper.paper_id:
-                return f'Newspaper with ID {new_paper.paper_id} already exists'
+                return 403
         self.newspapers.append(new_paper)
 
     def get_newspaper(self, paper_id: Union[int,str]) -> Optional[Newspaper]:
@@ -42,7 +42,7 @@ class Agency(object):
     def add_editor(self, new_editor):
         for editor in self.editors:
             if editor.editor_id == new_editor.editor_id:
-                return f'Editor with ID {new_editor.editor_id} already exists'
+                return 403
         self.editors.append(new_editor)
 
 
@@ -72,7 +72,7 @@ class Agency(object):
     def add_subscriber(self, subscriber):
         for sub in self.subscribers:
             if sub.subscriber_id == subscriber.subscriber_id:
-                return f'Subscriber with ID {subscriber.subscriber_id} already exists'
+                return 403
         self.subscribers.append(subscriber)
 
     def all_subscribers(self):

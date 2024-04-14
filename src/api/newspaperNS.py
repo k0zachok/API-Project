@@ -54,7 +54,11 @@ class NewspaperAPI(Resource):
                               name=newspaper_ns.payload['name'],
                               frequency=newspaper_ns.payload['frequency'],
                               price=newspaper_ns.payload['price'])
-        Agency.get_instance().add_newspaper(new_paper)
+        create = Agency.get_instance().add_newspaper(new_paper)
+        if create == 403:
+            abort(403, f'Newspaper with ID {paper_id} already exists')
+        else:
+            create
         # return the new paper
         return new_paper
 
@@ -71,7 +75,6 @@ class NewspaperID(Resource):
     def get(self, paper_id):
         search_result = Agency.get_instance().get_newspaper(paper_id)
         if search_result == 404:
-            print('Error 404')
             abort(404, f'Newspaper with ID {paper_id} was NOT found')
         return search_result
 
@@ -80,8 +83,8 @@ class NewspaperID(Resource):
     @newspaper_ns.marshal_with(paper_model, envelope='newspaper')
     def post(self, paper_id):
         targeted_paper = Agency.get_instance().get_newspaper(paper_id)
-        if not targeted_paper:
-            return jsonify(f"Newspaper with ID {paper_id} was not found")
+        if targeted_paper == 404:
+            abort(404, f'Newspaper with ID {paper_id} was NOT found')
         # print(newspaper_ns.payload)
         targeted_paper.name = newspaper_ns.payload['name']
         targeted_paper.frequency = newspaper_ns.payload['frequency']
@@ -91,8 +94,8 @@ class NewspaperID(Resource):
     @newspaper_ns.doc(description="Delete a new newspaper")
     def delete(self, paper_id):
         targeted_paper = Agency.get_instance().get_newspaper(paper_id)
-        if not targeted_paper:
-            return jsonify(f"Newspaper with ID {paper_id} was not found")
+        if targeted_paper == 404:
+            abort(404, f'Newspaper with ID {paper_id} was NOT found')
         Agency.get_instance().remove_newspaper(targeted_paper)
         return jsonify(f"Newspaper with ID {paper_id} was removed")
 
