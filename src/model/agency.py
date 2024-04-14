@@ -63,6 +63,9 @@ class Agency(object):
                     for issue in edit.issues:
                         issue.editor = edit
                         issue.editor_id = edit.editor_id
+                for i in editor.issues:
+                    i.editor = None
+                    i.editor_id = None
         self.editors.remove(editor)
 
 

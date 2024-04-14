@@ -69,9 +69,14 @@ def test_subscribe(client, agency):
                            })
     response1 = client.post('/subscriber/000/subscribe',
                             json={
+                                'paper_id':100
+                            })
+    response2 = client.post('/subscriber/356/subscribe',
+                            json={
                                 'paper_id':000
                             })
     assert response1.status_code == 404
+    assert response2.status_code == 404
     parsed = response.get_json()
     targeted_subscriber = agency.get_subscriber(765)
     targeted_newspaper = agency.get_newspaper(100)
@@ -82,3 +87,13 @@ def test_subscribe(client, agency):
     assert len(targeted_newspaper.subscribers) == before_subscribers + 1
 
 
+def test_subscriber_missing_issues(client, agency):
+    targeted_subscriber = agency.get_subscriber(915)
+    targeted_newspaper = agency.get_newspaper(100)
+    targeted_issue = targeted_newspaper.get_issue(777)
+    targeted_subscriber.subscribe(targeted_newspaper)
+    response = client.get('/subscriber/915/missingissues')
+    assert response.status_code == 200
+    parsed = response.get_json()['missing issues']['missing_issues'][0]
+    assert parsed['issue_id'] == 777
+    assert parsed['name'] == 'NYTimes2'

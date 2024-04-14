@@ -103,7 +103,10 @@ class Subscribe(Resource):
         targeted_paper = Agency.get_instance().get_newspaper(subscriber_ns.payload['paper_id'])
         if targeted_paper == 404:
             abort(404, f'Newspaper with ID {subscriber_ns.payload["paper_id"]} was NOT found')
-        Agency.get_instance().get_subscriber(subscriber_id).subscribe(targeted_paper)
+        targeted_sub = Agency.get_instance().get_subscriber(subscriber_id)
+        if targeted_sub == 404:
+            abort(404, f'Subscriber with ID {subscriber_id} was NOT found')
+        targeted_sub.subscribe(targeted_paper)
         return targeted_paper
 
 subscriber_stats_model = subscriber_ns.model('SubStats', {
@@ -116,7 +119,6 @@ subscriber_stats_model = subscriber_ns.model('SubStats', {
 
 @subscriber_ns.route('/<int:subscriber_id>/stats')
 class SubscriberStats(Resource):
-    #TODO: display issues specifically for paper (make a function that returns a dict and use it instead of marshal with) HOW TO IMPLEMENT BOTH DICT AND MODEL WITH OTHER INFO
     @subscriber_ns.doc(subscriber_stats_model, description="Subscriber's Statistics")
     @subscriber_ns.marshal_with(subscriber_stats_model, envelope='substats')
     def get(self, subscriber_id):

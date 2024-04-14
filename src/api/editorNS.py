@@ -14,10 +14,17 @@ editor_model = editor_ns.model('Editor', {
     'address': fields.String
 })
 
-editor_get_model = editor_ns.model('Editor', {
+
+newspaper_nested_model = editor_ns.model('NewspaperNested',{
+    'paper_id': fields.Integer,
+    'name': fields.String
+})
+
+editor_get_model = editor_ns.model('EditorGet', {
     'editor_id': fields.Integer,
     'name': fields.String,
-    'address': fields.String
+    'address': fields.String,
+    'newspapers': fields.List(fields.Nested(newspaper_nested_model), required=False)
 })
 
 
@@ -27,7 +34,7 @@ class EditorAPI(Resource):
     @editor_ns.expect(editor_model, validate=True)
     @editor_ns.marshal_with(editor_model, envelope='editor')
     def post(self):
-        editor_id = int(str(time.time())[7:10])
+        editor_id = int(str(time.time())[6:10])
         new_editor = Editor(editor_id=editor_id,
                             name=editor_ns.payload['name'],
                             address=editor_ns.payload['address'])
